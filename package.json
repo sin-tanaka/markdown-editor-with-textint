@@ -8,9 +8,22 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@textlint/kernel": "^3.0.1",
+    "@textlint/textlint-plugin-markdown": "^5.0.2",
+    "@types/events": "^1.2.0",
+    "@types/lodash": "^4.14.119",
+    "@types/marked": "^0.5.0",
+    "@types/node": "^10.12.18",
+    "axios": "^0.18.0",
+    "lodash": "^4.17.11",
+    "marked": "^0.5.2",
+    "textlint": "^11.0.2",
+    "textlint-rule-no-mix-dearu-desumasu": "^3.0.3",
+    "textlint-rule-no-todo": "^2.0.1",
+    "textlint-rule-preset-ja-spacing": "^2.0.1",
     "vue": "^2.5.17",
-    "vue-class-component": "^6.0.0",
-    "vue-property-decorator": "^7.0.0"
+    "vue-class-component": "^6.3.2",
+    "vue-property-decorator": "^7.2.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.2.0",
