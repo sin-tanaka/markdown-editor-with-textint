@@ -1,36 +1,26 @@
 {
+  "extends": [
+    "tslint-config-prettier"
+  ],
+  "rulesDirectory": ["tslint-plugin-prettier"],
   "lintOptions": {
     "typeCheck": true
   },
   "rules": {
+    "prettier": true,
     "await-promise": true,
     "class-name": true,
     "comment-format": [
       true,
       "check-space"
     ],
-    "indent": [
-      true,
-      "spaces"
-    ],
+    "semicolon": false,
     "no-duplicate-variable": true,
     "no-eval": true,
     "no-internal-module": false,
     "no-invalid-template-strings": true,
     "no-trailing-whitespace": false,
     "no-var-keyword": true,
-    "one-line": [
-      true,
-      "check-open-brace",
-      "check-whitespace"
-    ],
-    "quotemark": [
-      true,
-      "single"
-    ],
-    "semicolon": [
-      true
-    ],
     "triple-equals": [
       true,
       "allow-null-check"

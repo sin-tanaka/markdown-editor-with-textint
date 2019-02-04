@@ -1,126 +1,57 @@
 <template>
-  <div id="editor">
-    <textarea class="raw-input" :value="input" @input="update"></textarea>
-    <div class="editor-result">
-      <div class="select">
-        <input type="radio" id="markdown" value="markdown" v-model="picked">
-        <label for="markdown">Markdown</label>
-        <input type="radio" id="textlint" value="textlint" v-model="picked">
-        <label for="textlint">textlint</label>
-      </div>
-      <div v-if="picked === 'markdown'" class="marked-input" v-html="compiledMarkdown"></div>
-      <div v-else class="status">
-        <ul>
-          <li v-for="error in errorMessages">
-            <span> ({{ error.line }}, {{ error.column }})</span>
-            {{ error.message }}
-            <span> {{error.ruleId}}</span>
-          </li>
-        </ul>
-      </div>
-    </div>
+  <div class="hello">
+    <h1>{{ msg }}</h1>
+    <p>
+      For a guide and recipes on how to configure / customize this project,<br>
+      check out the
+      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
+    </p>
+    <h3>Installed CLI Plugins</h3>
+    <ul>
+      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-typescript" target="_blank" rel="noopener">typescript</a></li>
+    </ul>
+    <h3>Essential Links</h3>
+    <ul>
+      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
+      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
+      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
+      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
+      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
+    </ul>
+    <h3>Ecosystem</h3>
+    <ul>
+      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
+      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
+      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
+      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
+      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
+    </ul>
   </div>
 </template>
 
 <script lang="ts">
-  import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-  import {TextlintKernel, TextlintMessage} from '@textlint/kernel';
-  import _ from 'lodash';
-  import marked from 'marked';
-  // import NoTodo from 'textlint-rule-no-todo';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  @Component
-  export default class HelloWorld extends Vue {
-    input: string = '# hello Vue.js';
-    errorMessages: TextlintMessage[] = [];
-    picked: 'markdown' | 'textlint' = 'markdown';
-
-    debounce = _.debounce;
-
-    kernel = new TextlintKernel();
-    options = {
-      ext: '.md',
-      plugins: [
-        {
-          pluginId: 'markdown',
-          plugin: require('@textlint/textlint-plugin-markdown'),
-        },
-      ],
-      // rules: require('textlint-rule-preset-ja-spacing/src'),
-      rules: [
-        {
-          ruleId: 'nakaguro-or-halfwidth-space-between-katakana',
-          rule: require('textlint-rule-ja-nakaguro-or-halfwidth-space-between-katakana'),
-        },
-        // {
-        //   ruleId: 'no-mix-dearu',
-        //   rule: rules.rules['ja-nakaguro-or-halfwidth-space-between-katakana'],
-        // },
-      ],
-    };
-
-    get compiledMarkdown() {
-      return marked(this.input, {sanitize: true});
-    }
-
-    update(e: Event) {
-      console.log('debounce');
-      this.input = (<HTMLInputElement>e.target).value;
-      this.doTextlint();
-    }
-
-    doTextlint() {
-      console.log('doTextlint');
-      this.kernel.lintText(this.input, this.options).then(result => {
-        this.errorMessages = result.messages;
-        console.log(result);
-      });
-    }
-
-    mounted() {
-      this.update = _.debounce(this.update, 300);
-    }
-  }
+@Component
+export default class HelloWorld extends Vue {
+  @Prop() private msg!: string;
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-#editor {
-  display: flex;
-  width: 98vw;
-  height: 98vh;
+h3 {
+  margin: 40px 0 0;
 }
-.raw-input, .editor-result {
-  width: 99%;
-  height: 100%;
-
-  text-align: left;
-  padding: 10px;
-  box-sizing: border-box;
+ul {
+  list-style-type: none;
+  padding: 0;
 }
-.status {
-  text-align: left;
-  padding: 10px;
-  box-sizing: border-box;
-  width: auto;
-  height: 100%;
+li {
+  display: inline-block;
+  margin: 0 10px;
 }
-.raw-input {
-  border: none;
-  border-right: 1px solid #ccc;
-  resize: none;
-  outline: none;
-  background-color: #f6f6f6;
-  font-size: 14px;
-  padding: 20px;
-}
-.status {
-  border: 1px solid #ccc;
-}
-.select {
-  display: flex;
-}
-code {
-  color: #f66;
+a {
+  color: #42b983;
 }
 </style>
