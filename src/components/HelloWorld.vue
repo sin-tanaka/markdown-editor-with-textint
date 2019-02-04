@@ -1,97 +1,125 @@
 <template>
   <div id="editor">
-    <textarea :value="input" @input="update"></textarea>
-    <div v-html="compiledMarkdown"></div>
+    <textarea class="raw-input" :value="input" @input="update"></textarea>
+    <div class="editor-result">
+      <div class="select">
+        <input type="radio" id="markdown" value="markdown" v-model="picked">
+        <label for="markdown">Markdown</label>
+        <input type="radio" id="textlint" value="textlint" v-model="picked">
+        <label for="textlint">textlint</label>
+      </div>
+      <div v-if="picked === 'markdown'" class="marked-input" v-html="compiledMarkdown"></div>
+      <div v-else class="status">
+        <ul>
+          <li v-for="error in errorMessages">
+            <span> ({{ error.line }}, {{ error.column }})</span>
+            {{ error.message }}
+            <span> {{error.ruleId}}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-import { TextlintKernel } from '@textlint/kernel';
-import _ from 'lodash';
-import marked from 'marked';
+  import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
+  import {TextlintKernel, TextlintMessage} from '@textlint/kernel';
+  import _ from 'lodash';
+  import marked from 'marked';
+  // import NoTodo from 'textlint-rule-no-todo';
 
-@Component
-export default class HelloWorld extends Vue {
-  @Prop() private msg!: string;
+  @Component
+  export default class HelloWorld extends Vue {
+    input: string = '# hello Vue.js';
+    errorMessages: TextlintMessage[] = [];
+    picked: 'markdown' | 'textlint' = 'markdown';
 
-  input: string = '# hello Vue.js';
+    debounce = _.debounce;
 
-  debounce = _.debounce;
+    kernel = new TextlintKernel();
+    options = {
+      ext: '.md',
+      plugins: [
+        {
+          pluginId: 'markdown',
+          plugin: require('@textlint/textlint-plugin-markdown'),
+        },
+      ],
+      // rules: require('textlint-rule-preset-ja-spacing/src'),
+      rules: [
+        {
+          ruleId: 'nakaguro-or-halfwidth-space-between-katakana',
+          rule: require('textlint-rule-ja-nakaguro-or-halfwidth-space-between-katakana'),
+        },
+        // {
+        //   ruleId: 'no-mix-dearu',
+        //   rule: rules.rules['ja-nakaguro-or-halfwidth-space-between-katakana'],
+        // },
+      ],
+    };
 
-  get compiledMarkdown() {
+    get compiledMarkdown() {
       return marked(this.input, {sanitize: true});
-  }
+    }
 
-    update(e) {
-        console.log('debounce');
-        this.input = e.target.value;
+    update(e: Event) {
+      console.log('debounce');
+      this.input = (<HTMLInputElement>e.target).value;
+      this.doTextlint();
+    }
+
+    doTextlint() {
+      console.log('doTextlint');
+      this.kernel.lintText(this.input, this.options).then(result => {
+        this.errorMessages = result.messages;
+        console.log(result);
+      });
     }
 
     mounted() {
-        this.update = _.debounce(this.update, 300);
-
-      const kernel = new TextlintKernel();
-
-      const options = {
-          ext: '.md',
-          plugins: [
-              {
-                  pluginId: 'markdown',
-                  plugin: require('@textlint/textlint-plugin-markdown'),
-              },
-          ],
-          // rules: require('textlint-rule-preset-ja-spacing/src'),
-          rules: [
-              {
-                  ruleId: 'no-mix-dearu-desumasu',
-          //         // rule: require('textlint-rule-no-mix-dearu-desumasu'),
-          //         // rule: require('textlint-rule-no-todo'),
-          //         rule: require('textlint-rule-preset-ja-spacing/src'),
-                  rule: require('textlint-rule-ja-nakaguro-or-halfwidth-space-between-katakana'),
-
-              },
-          ],
-      };
-
-      // console.log(options);
-
-      kernel.lintText('パソコン　ソフトはすごい。', options).then(result => {
-          console.log(result);
-      });
+      this.update = _.debounce(this.update, 300);
+    }
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-html, body, #editor {
-  margin: 0;
-  height: 100%;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
-  color: #333;
+#editor {
+  display: flex;
+  width: 98vw;
+  height: 98vh;
 }
-
-textarea, #editor div {
-  display: inline-block;
-  width: 49%;
+.raw-input, .editor-result {
+  width: 99%;
   height: 100%;
-  vertical-align: top;
+
+  text-align: left;
+  padding: 10px;
   box-sizing: border-box;
-  padding: 0 20px;
 }
-
-textarea {
+.status {
+  text-align: left;
+  padding: 10px;
+  box-sizing: border-box;
+  width: auto;
+  height: 100%;
+}
+.raw-input {
   border: none;
   border-right: 1px solid #ccc;
   resize: none;
   outline: none;
   background-color: #f6f6f6;
   font-size: 14px;
-  font-family: 'Monaco', courier, monospace;
   padding: 20px;
 }
-
+.status {
+  border: 1px solid #ccc;
+}
+.select {
+  display: flex;
+}
 code {
   color: #f66;
 }
